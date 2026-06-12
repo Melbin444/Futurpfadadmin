@@ -55,25 +55,29 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       const id = url.searchParams.get("id");
 
       if (id) {
-        // Single blog details
+        console.log(`[Admin Blogs API] Fetching single blog post with ID: "${id}"`);
         const result = await db.prepare("SELECT * FROM blogs WHERE id = ?").bind(id).first<BlogData>();
         if (!result) {
+          console.warn(`[Admin Blogs API] Blog post not found: "${id}"`);
           return new Response(JSON.stringify({ error: "Blog not found" }), {
             status: 404,
             headers: { "Content-Type": "application/json" },
           });
         }
+        console.log(`[Admin Blogs API] Successfully retrieved blog post: "${id}"`);
         return new Response(JSON.stringify(result), {
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      // List all blogs
+      console.log("[Admin Blogs API] Listing all blog posts");
       const result = await db.prepare("SELECT * FROM blogs ORDER BY date DESC").all();
+      console.log(`[Admin Blogs API] Successfully retrieved ${result.results?.length ?? 0} blog posts`);
       return new Response(JSON.stringify(result.results || []), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Blogs API] GET Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -85,7 +89,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (request.method === "POST") {
     try {
       const data = (await request.json()) as BlogData;
+      console.log("[Admin Blogs API] Creating new blog post:", JSON.stringify(data));
       if (!data.id || !data.title_en || !data.title_de) {
+        console.warn("[Admin Blogs API] Creation failed: Missing required fields (id, title_en, title_de)");
         return new Response(JSON.stringify({ error: "Missing required fields (id, title_en, title_de)" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -95,6 +101,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       // Check duplicate ID
       const existing = await db.prepare("SELECT id FROM blogs WHERE id = ?").bind(data.id).first();
       if (existing) {
+        console.warn(`[Admin Blogs API] Creation failed: Blog post with ID "${data.id}" already exists`);
         return new Response(JSON.stringify({ error: "A blog post with this ID (slug) already exists" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -127,10 +134,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         )
         .run();
 
+      console.log(`[Admin Blogs API] Successfully created blog post: "${data.id}"`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Blogs API] POST Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -142,14 +151,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (request.method === "PUT") {
     try {
       const data = (await request.json()) as BlogData;
+      console.log(`[Admin Blogs API] Updating blog post: "${data.id}"`, JSON.stringify(data));
       if (!data.id) {
+        console.warn("[Admin Blogs API] Update failed: Missing blog id");
         return new Response(JSON.stringify({ error: "Missing blog id" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db
+      const updateResult = await db
         .prepare(
           `UPDATE blogs SET 
             category_en = ?, category_de = ?, title_en = ?, title_de = ?, 
@@ -175,10 +186,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         )
         .run();
 
+      console.log(`[Admin Blogs API] Successfully updated blog post: "${data.id}". success: ${updateResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Blogs API] PUT Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -191,18 +204,22 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     try {
       const url = new URL(request.url);
       const id = url.searchParams.get("id");
+      console.log(`[Admin Blogs API] Deleting blog post: "${id}"`);
       if (!id) {
+        console.warn("[Admin Blogs API] Delete failed: Missing blog id");
         return new Response(JSON.stringify({ error: "Missing blog id" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db.prepare("DELETE FROM blogs WHERE id = ?").bind(id).run();
+      const deleteResult = await db.prepare("DELETE FROM blogs WHERE id = ?").bind(id).run();
+      console.log(`[Admin Blogs API] Successfully deleted blog post: "${id}". success: ${deleteResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Blogs API] DELETE Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -210,6 +227,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     }
   }
 
+  console.warn(`[Admin Blogs API] Method not allowed: ${request.method}`);
   return new Response(JSON.stringify({ error: "Method not allowed" }), {
     status: 405,
     headers: { "Content-Type": "application/json" },

@@ -74,23 +74,29 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       const id = url.searchParams.get("id");
 
       if (id) {
+        console.log(`[Admin Testimonials API] Fetching single testimonial with ID: "${id}"`);
         const result = await db.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).first<any>();
         if (!result) {
+          console.warn(`[Admin Testimonials API] Testimonial not found: "${id}"`);
           return new Response(JSON.stringify({ error: "Testimonial not found" }), {
             status: 404,
             headers: { "Content-Type": "application/json" },
           });
         }
+        console.log(`[Admin Testimonials API] Successfully retrieved testimonial: "${id}"`);
         return new Response(JSON.stringify(result), {
           headers: { "Content-Type": "application/json" },
         });
       }
 
+      console.log("[Admin Testimonials API] Listing all testimonials");
       const result = await db.prepare("SELECT * FROM testimonials").all();
+      console.log(`[Admin Testimonials API] Successfully fetched ${result.results?.length ?? 0} testimonials`);
       return new Response(JSON.stringify(result.results || []), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Testimonials API] GET Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -102,7 +108,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (request.method === "POST") {
     try {
       const data = (await request.json()) as TestimonialData;
+      console.log("[Admin Testimonials API] Creating new testimonial:", JSON.stringify(data));
       if (!data.id || !data.name || !data.origin) {
+        console.warn("[Admin Testimonials API] Creation failed: Missing required fields (id, name, origin)");
         return new Response(JSON.stringify({ error: "Missing required fields (id, name, origin)" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -112,13 +120,14 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       // Check duplicates
       const existing = await db.prepare("SELECT id FROM testimonials WHERE id = ?").bind(data.id).first();
       if (existing) {
+        console.warn(`[Admin Testimonials API] Creation failed: Testimonial with ID "${data.id}" already exists`);
         return new Response(JSON.stringify({ error: "A testimonial with this ID already exists" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db
+      const insertResult = await db
         .prepare(
           `INSERT INTO testimonials (
             id, name, origin, flag, role_en, role_de, destination, 
@@ -151,10 +160,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         )
         .run();
 
+      console.log(`[Admin Testimonials API] Successfully created testimonial: "${data.id}". success: ${insertResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Testimonials API] POST Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -166,14 +177,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (request.method === "PUT") {
     try {
       const data = (await request.json()) as TestimonialData;
+      console.log(`[Admin Testimonials API] Updating testimonial: "${data.id}"`, JSON.stringify(data));
       if (!data.id) {
+        console.warn("[Admin Testimonials API] Update failed: Missing testimonial id");
         return new Response(JSON.stringify({ error: "Missing testimonial id" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db
+      const updateResult = await db
         .prepare(
           `UPDATE testimonials SET 
             name = ?, origin = ?, flag = ?, role_en = ?, role_de = ?, destination = ?, 
@@ -206,10 +219,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         )
         .run();
 
+      console.log(`[Admin Testimonials API] Successfully updated testimonial: "${data.id}". success: ${updateResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Testimonials API] PUT Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -222,18 +237,22 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     try {
       const url = new URL(request.url);
       const id = url.searchParams.get("id");
+      console.log(`[Admin Testimonials API] Deleting testimonial with ID: "${id}"`);
       if (!id) {
+        console.warn("[Admin Testimonials API] Delete failed: Missing testimonial id");
         return new Response(JSON.stringify({ error: "Missing testimonial id" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
+      const deleteResult = await db.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
+      console.log(`[Admin Testimonials API] Successfully deleted testimonial: "${id}". success: ${deleteResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Testimonials API] DELETE Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -241,6 +260,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     }
   }
 
+  console.warn(`[Admin Testimonials API] Method not allowed: ${request.method}`);
   return new Response(JSON.stringify({ error: "Method not allowed" }), {
     status: 405,
     headers: { "Content-Type": "application/json" },

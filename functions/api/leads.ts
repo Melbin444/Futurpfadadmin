@@ -34,11 +34,14 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   // GET: List all leads
   if (request.method === "GET") {
     try {
+      console.log("[Admin Leads API] Listing all leads from database");
       const result = await db.prepare("SELECT * FROM leads ORDER BY created_at DESC").all();
+      console.log(`[Admin Leads API] Successfully fetched ${result.results?.length ?? 0} leads`);
       return new Response(JSON.stringify(result.results || []), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Leads API] GET Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -50,22 +53,26 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (request.method === "PUT") {
     try {
       const { id, status } = (await request.json()) as { id: string; status: string };
+      console.log(`[Admin Leads API] Updating lead "${id}" status to "${status}"`);
       if (!id || !status) {
+        console.warn("[Admin Leads API] Update failed: Missing id or status");
         return new Response(JSON.stringify({ error: "Missing id or status" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db
+      const updateResult = await db
         .prepare("UPDATE leads SET status = ? WHERE id = ?")
         .bind(status, id)
         .run();
 
+      console.log(`[Admin Leads API] Successfully updated lead "${id}" to "${status}". success: ${updateResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Leads API] PUT Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -78,18 +85,22 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     try {
       const url = new URL(request.url);
       const id = url.searchParams.get("id");
+      console.log(`[Admin Leads API] Deleting lead: "${id}"`);
       if (!id) {
+        console.warn("[Admin Leads API] Delete failed: Missing lead id");
         return new Response(JSON.stringify({ error: "Missing lead id" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      await db.prepare("DELETE FROM leads WHERE id = ?").bind(id).run();
+      const deleteResult = await db.prepare("DELETE FROM leads WHERE id = ?").bind(id).run();
+      console.log(`[Admin Leads API] Successfully deleted lead "${id}". success: ${deleteResult.success}`);
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
+      console.error("[Admin Leads API] DELETE Error:", e);
       return new Response(JSON.stringify({ error: (e as Error).message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -97,6 +108,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     }
   }
 
+  console.warn(`[Admin Leads API] Method not allowed: ${request.method}`);
   return new Response(JSON.stringify({ error: "Method not allowed" }), {
     status: 405,
     headers: { "Content-Type": "application/json" },
