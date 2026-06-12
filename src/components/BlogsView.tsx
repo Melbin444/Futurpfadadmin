@@ -308,37 +308,50 @@ export function BlogsView({
         /* ARTICLES LIST */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {blogs.map((blog) => (
-            <div key={blog.id} className="glass-luxe p-6.5 rounded-[2rem] border border-white/60 shadow-soft flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
-              <div className="space-y-4">
-                {blog.img_url && (
-                  <div className="w-full h-40 rounded-2xl overflow-hidden border border-champagne/30 mb-2 shadow-inner">
-                    <img src={blog.img_url} alt={blog.title_en} className="w-full h-full object-cover" />
-                  </div>
-                )}
-                <div className="flex justify-between items-center">
-                  <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-bold uppercase tracking-wider rounded-full">
+            <div key={blog.id} className="group glass-luxe rounded-[2.2rem] border border-white/70 shadow-soft hover:shadow-luxe hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div>
+                {/* Image Section */}
+                <div className="relative w-full h-44 overflow-hidden bg-slate-50 border-b border-champagne/30 shrink-0">
+                  {blog.img_url ? (
+                    <img src={blog.img_url} alt={blog.title_en} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+                  ) : (
+                    <div className="w-full h-full bg-[#fdfcf7] flex flex-col items-center justify-center text-slate-350 font-serif italic text-xs select-none">
+                      🧭 No illustration provided
+                    </div>
+                  )}
+                  {/* Category overlay */}
+                  <span className="absolute top-4 left-4 inline-block px-3 py-1 bg-white/95 backdrop-blur-sm border border-champagne/40 text-[#b45309] text-[8.5px] font-extrabold uppercase tracking-wider rounded-full shadow-sm">
                     {blog.category_en}
                   </span>
-                  <span className="text-[10px] text-slate-450 font-mono">{blog.date}</span>
                 </div>
-                <div>
-                  <h4 className="text-[16px] font-serif font-bold text-navy-deep leading-snug">{blog.title_en}</h4>
-                  <p className="text-[12px] text-slate-550 font-light mt-2 line-clamp-2">{blog.summary_en}</p>
+
+                {/* Content Section */}
+                <div className="p-6 space-y-3">
+                  <span className="text-[9.5px] text-slate-400 font-mono font-medium block">{blog.date}</span>
+                  <h4 className="text-[17px] font-serif font-bold text-navy-deep leading-snug group-hover:text-[#b45309] transition-colors duration-300">
+                    {blog.title_en}
+                  </h4>
+                  <p className="text-[12.5px] text-slate-500 font-light leading-relaxed line-clamp-2">
+                    {blog.summary_en}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-champagne/20 flex justify-between items-center">
-                <span className="text-[10px] text-slate-400 font-mono">By {blog.author}</span>
+              {/* Footer Actions */}
+              <div className="mx-6 mb-6 pt-4 border-t border-champagne/30 flex justify-between items-center shrink-0">
+                <span className="text-[10px] text-slate-450 font-serif italic">By {blog.author}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveBlog(blog)}
-                    className="p-2 bg-white hover:bg-slate-50 border border-champagne rounded-xl text-slate-500 hover:text-navy transition-colors shadow-sm cursor-pointer"
+                    title="Edit Post"
+                    className="p-2 bg-white hover:bg-amber-50 border border-champagne hover:border-amber-250 rounded-xl text-slate-550 hover:text-[#b45309] transition-all shadow-sm cursor-pointer active:scale-95"
                   >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => deleteBlog(blog.id)}
-                    className="p-2 bg-red-50/60 hover:bg-red-100/80 border border-red-200/50 rounded-xl text-red-655 hover:text-red-750 transition-colors shadow-sm cursor-pointer"
+                    title="Delete Post"
+                    className="p-2 bg-red-50/50 hover:bg-red-100/80 border border-red-200/50 hover:border-red-300/50 rounded-xl text-red-600 transition-all shadow-sm cursor-pointer active:scale-95"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

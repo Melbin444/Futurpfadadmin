@@ -468,41 +468,69 @@ export function TestimonialsView({
         /* CARDS LIST */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {testimonials.map((test) => (
-            <div key={test.id} className="glass-luxe p-6.5 rounded-[2rem] border border-white/60 shadow-soft flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
+            <div key={test.id} className="group glass-luxe rounded-[2.2rem] border border-white/70 shadow-soft hover:shadow-luxe hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div className="p-6.5 space-y-5">
+                
+                {/* Header Profile Section */}
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex items-center gap-4">
                     {test.img_url ? (
-                      <div className="h-10 w-10 rounded-full overflow-hidden border border-champagne/60 shrink-0">
-                        <img src={test.img_url} alt={test.name} className="h-full w-full object-cover" />
+                      <div className="h-12 w-12 rounded-2xl overflow-hidden border border-champagne shadow-sm shrink-0">
+                        <img src={test.img_url} alt={test.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       </div>
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-[#f5f0e6] border border-champagne/60 flex items-center justify-center text-xl shrink-0">
+                      <div className="h-12 w-12 rounded-2xl bg-[#faf6ee] border border-champagne/80 flex items-center justify-center text-2xl shrink-0 shadow-inner">
                         {test.flag || "🇩🇪"}
                       </div>
                     )}
                     <div>
-                      <h4 className="text-sm font-bold text-navy-deep font-sans leading-tight">{test.name}</h4>
-                      <p className="text-[10px] text-slate-450 font-mono mt-0.5">{test.flag || "🇩🇪"} From {test.origin} to {test.destination}</p>
+                      <h4 className="text-base font-bold text-navy-deep font-sans leading-snug">{test.name}</h4>
+                      <p className="text-[10.5px] text-slate-450 font-medium tracking-wide mt-0.5">
+                        {test.flag || "🇩🇪"} {test.origin} &rarr; {test.destination}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-[10.5px] font-bold text-[#b45309] font-serif leading-none mt-1">
-                    {test.employer_company}
-                  </span>
+                  <div className="text-right">
+                    <span className="inline-block px-2.5 py-1 bg-amber-50/80 border border-amber-100 text-[#b45309] text-[8.5px] font-extrabold uppercase tracking-wider rounded-full shadow-sm">
+                      {test.employer_company}
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-[#faf9f6]/50 border border-champagne/20 rounded-xl p-3.5">
-                  <p className="text-[12px] font-serif italic text-navy/80 leading-relaxed">"{test.quote_en}"</p>
-                  <span className="text-[9.5px] text-slate-500 font-bold block mt-2">— {test.employer_name} ({test.employer_role_en})</span>
+
+                {/* Review Quote Block */}
+                <div className="relative bg-[#faf9f6]/95 border border-champagne/25 rounded-2xl p-4.5 shadow-sm">
+                  {/* Small decorative quote icon */}
+                  <span className="absolute top-2 right-4 text-3xl font-serif text-amber-600/10 select-none pointer-events-none">“</span>
+                  <p className="text-[12.5px] font-serif-it font-light text-navy/90 leading-relaxed italic pr-4">
+                    "{test.quote_en}"
+                  </p>
+                  <div className="mt-3 pt-2 border-t border-champagne/20 flex justify-between items-center">
+                    <span className="text-[9.5px] text-slate-500 font-bold">— {test.employer_name}</span>
+                    <span className="text-[9px] text-[#b45309] font-medium font-mono uppercase">{test.employer_role_en}</span>
+                  </div>
                 </div>
+
+                {/* Milestones count preview */}
+                {Array.isArray(test.milestones_en) && test.milestones_en.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-widest">Milestones:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {test.milestones_en.map((_, idx) => (
+                        <span key={idx} className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Milestone completed" />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="mt-6 pt-4 border-t border-champagne/20 flex justify-between items-center">
+              {/* Footer Controls */}
+              <div className="mx-6 mb-6 pt-4 border-t border-champagne/30 flex justify-between items-center shrink-0">
                 <div className="flex gap-2">
-                  <span className="inline-block px-3 py-1 bg-amber-50 text-[#b45309] text-[9.5px] font-bold rounded-full border border-amber-100">
+                  <span className="inline-block px-3 py-1 bg-[#f5f0e6] border border-champagne/60 text-[#b45309] text-[9px] font-bold rounded-full">
                     {test.sector_en}
                   </span>
                   {test.video_url && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-600 text-[9.5px] font-bold rounded-full border border-red-100">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-655 text-[9px] font-bold rounded-full border border-red-100">
                       <Video className="h-3.5 w-3.5 shrink-0" />
                       Video
                     </span>
@@ -511,13 +539,15 @@ export function TestimonialsView({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveTestimonial(test)}
-                    className="p-2 bg-white hover:bg-slate-50 border border-champagne rounded-xl text-slate-500 hover:text-navy transition-colors shadow-sm cursor-pointer"
+                    title="Edit Placement Profile"
+                    className="p-2 bg-white hover:bg-amber-50 border border-champagne hover:border-amber-250 rounded-xl text-slate-555 hover:text-[#b45309] transition-all shadow-sm cursor-pointer active:scale-95"
                   >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => deleteTestimonial(test.id)}
-                    className="p-2 bg-red-50/60 hover:bg-red-100/80 border border-red-200/50 rounded-xl text-red-655 hover:text-red-750 transition-colors shadow-sm cursor-pointer"
+                    title="Delete Profile"
+                    className="p-2 bg-red-50/50 hover:bg-red-100/80 border border-red-200/50 hover:border-red-300/50 rounded-xl text-red-600 transition-all shadow-sm cursor-pointer active:scale-95"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
