@@ -1,18 +1,10 @@
-import React from "react";
 import {
   Users,
   BookOpen,
   Award,
-  HelpCircle,
-  ShieldCheck,
-  CheckCircle2,
-  RefreshCw,
-  ExternalLink,
-  Plus,
   ChevronRight
 } from "lucide-react";
 import { TabType, DashboardStats } from "../engines/types";
-import { toast } from "sonner";
 
 interface DashboardViewProps {
   stats: DashboardStats | null;
@@ -26,10 +18,6 @@ interface DashboardViewProps {
 export function DashboardView({
   stats,
   setActiveTab,
-  loadStats,
-  setIsLoading,
-  setActiveBlog,
-  setActiveTestimonial,
 }: DashboardViewProps) {
   return (
     <div className="space-y-6 animate-fadeIn">

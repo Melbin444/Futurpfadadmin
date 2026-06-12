@@ -1,4 +1,3 @@
-import React from "react";
 import { createPortal } from "react-dom";
 import { Search, X, Check, Archive, Trash2, Mail, Phone } from "lucide-react";
 import { Lead } from "../engines/types";

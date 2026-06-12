@@ -4,7 +4,6 @@ import {
   Users,
   BookOpen,
   Award,
-  HelpCircle,
   LogOut,
   ExternalLink
 } from "lucide-react";
