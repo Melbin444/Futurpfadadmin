@@ -79,13 +79,32 @@ export function LeadsView({
                   l.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   (l.message || "").toLowerCase().includes(searchTerm.toLowerCase())
               )
-              .map((lead) => (
-                <tr key={lead.id} className="hover:bg-[#faf9f6]/40 transition-all duration-200">
-                  <td className="py-5 px-6 font-bold text-navy-deep font-sans">{lead.name}</td>
-                  <td className="py-5 px-6">
-                    <div className="text-slate-650 font-semibold">{lead.email}</div>
-                    {lead.phone && <div className="text-[10px] text-slate-400 font-mono mt-0.5">{lead.phone}</div>}
-                  </td>
+              .map((lead) => {
+                const isB2B = (lead.message || "").includes("B2B Sourcing Inquiry:") ||
+                              (lead.message || "").includes("B2B Sourcing Request:") ||
+                              (lead.message || "").includes("Employer B2B Request:") ||
+                              (lead.message || "").includes("B2B Sourcing Consultation:") ||
+                              (lead.message || "").includes("Company:") ||
+                              (lead.message || "").includes("Organisation:");
+
+                return (
+                  <tr key={lead.id} className="hover:bg-[#faf9f6]/40 transition-all duration-200">
+                    <td className="py-5 px-6 font-bold text-navy-deep font-sans">
+                      <div className="flex flex-col gap-1 items-start">
+                        <span>{lead.name}</span>
+                        <span className={`text-[8.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                          isB2B
+                            ? "bg-amber-50 text-amber-700 border border-amber-250/50"
+                            : "bg-sky-50 text-sky-800 border border-sky-250/50"
+                        }`}>
+                          {isB2B ? "B2B Partner" : "Candidate"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-5 px-6">
+                      <div className="text-slate-650 font-semibold">{lead.email}</div>
+                      {lead.phone && <div className="text-[10px] text-slate-400 font-mono mt-0.5">{lead.phone}</div>}
+                    </td>
                   <td className="py-5 px-6 text-slate-500 font-sans">
                     {new Date(lead.created_at).toLocaleDateString(undefined, {
                       year: "numeric",
@@ -116,7 +135,7 @@ export function LeadsView({
                     </button>
                   </td>
                 </tr>
-              ))}
+              ); })}
           </tbody>
         </table>
       </div>
