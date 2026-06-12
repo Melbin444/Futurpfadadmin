@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Check, Archive, Trash2, Mail, Phone } from "lucide-react";
 import { Lead } from "../engines/types";
 
 interface LeadsViewProps {
@@ -88,54 +88,105 @@ export function LeadsView({
                               (lead.message || "").includes("Organisation:");
 
                 return (
-                  <tr key={lead.id} className="hover:bg-[#faf9f6]/40 transition-all duration-200">
-                    <td className="py-5 px-6 font-bold text-navy-deep font-sans">
-                      <div className="flex flex-col gap-1 items-start">
-                        <span>{lead.name}</span>
-                        <span className={`text-[8.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                          isB2B
-                            ? "bg-amber-50 text-amber-700 border border-amber-250/50"
-                            : "bg-sky-50 text-sky-800 border border-sky-250/50"
-                        }`}>
-                          {isB2B ? "B2B Partner" : "Candidate"}
-                        </span>
+                  <tr key={lead.id} className={`hover:bg-[#faf9f6]/60 transition-all duration-205 ${
+                    lead.status === "new" ? "bg-amber-50/20" : ""
+                  }`}>
+                    <td className="py-5 px-6 font-sans">
+                      <div className="flex flex-col gap-1 items-start max-w-[280px] sm:max-w-sm">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold text-navy-deep text-xs">{lead.name}</span>
+                          <span className={`text-[8.5px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                            isB2B
+                              ? "bg-amber-55 bg-opacity-10 text-amber-700 border border-amber-250/40"
+                              : "bg-sky-55 bg-opacity-10 text-sky-850 border border-sky-250/40"
+                          }`}>
+                            {isB2B ? "B2B Partner" : "Candidate"}
+                          </span>
+                        </div>
+                        {lead.message && (
+                          <span className="text-[11px] text-slate-450 line-clamp-1 italic font-light mt-0.5">
+                            "{lead.message.replace(/\s+/g, ' ')}"
+                          </span>
+                        )}
                       </div>
                     </td>
-                    <td className="py-5 px-6">
-                      <div className="text-slate-650 font-semibold">{lead.email}</div>
-                      {lead.phone && <div className="text-[10px] text-slate-400 font-mono mt-0.5">{lead.phone}</div>}
+                    <td className="py-5 px-6 font-sans">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-slate-650 font-semibold">
+                          <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span>{lead.email}</span>
+                        </div>
+                        {lead.phone && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-450 font-mono">
+                            <Phone className="h-3 w-3 text-slate-350 shrink-0" />
+                            <span>{lead.phone}</span>
+                          </div>
+                        )}
+                      </div>
                     </td>
-                  <td className="py-5 px-6 text-slate-500 font-sans">
-                    {new Date(lead.created_at).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric"
-                    })}
-                  </td>
-                  <td className="py-5 px-6">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                      lead.status === "new"
-                        ? "bg-amber-50 text-amber-700 border border-amber-250 animate-pulse"
-                        : lead.status === "contacted"
-                          ? "bg-emerald-50 text-emerald-700 border border-emerald-250"
-                          : "bg-slate-50 text-slate-400 border border-slate-200"
-                    }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${
-                        lead.status === "new" ? "bg-amber-500" : lead.status === "contacted" ? "bg-emerald-500" : "bg-slate-350"
-                      }`} />
-                      {lead.status}
-                    </span>
-                  </td>
-                  <td className="py-5 px-6 text-right">
-                    <button
-                      onClick={() => setSelectedLead(lead)}
-                      className="text-[9px] font-bold uppercase tracking-wider px-3.5 py-2 bg-white border border-champagne hover:border-slate-350 text-navy rounded-xl transition-all shadow-sm cursor-pointer"
-                    >
-                      Open Inquiry Log
-                    </button>
-                  </td>
-                </tr>
-              ); })}
+                    <td className="py-5 px-6 text-slate-500 font-sans">
+                      {new Date(lead.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      })}
+                    </td>
+                    <td className="py-5 px-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                        lead.status === "new"
+                          ? "bg-amber-50 text-amber-750 border border-amber-250 animate-pulse"
+                          : lead.status === "contacted"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-250"
+                            : "bg-slate-50 text-slate-400 border border-slate-200"
+                      }`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${
+                          lead.status === "new" ? "bg-amber-500" : lead.status === "contacted" ? "bg-emerald-500" : "bg-slate-350"
+                        }`} />
+                        {lead.status}
+                      </span>
+                    </td>
+                    <td className="py-5 px-6 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => setSelectedLead(lead)}
+                          title="Open Details Log"
+                          className="p-2 bg-white hover:bg-slate-50 border border-champagne rounded-xl text-slate-500 hover:text-navy transition-colors shadow-sm cursor-pointer"
+                        >
+                          <Search className="h-3.5 w-3.5" />
+                        </button>
+                        
+                        {lead.status === "new" && (
+                          <button
+                            onClick={() => updateLeadStatus(lead.id, "contacted")}
+                            title="Mark as Contacted"
+                            className="p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-250 text-emerald-600 rounded-xl transition-colors shadow-sm cursor-pointer"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        
+                        {lead.status !== "archived" && (
+                          <button
+                            onClick={() => updateLeadStatus(lead.id, "archived")}
+                            title="Archive Lead"
+                            className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-colors shadow-sm cursor-pointer"
+                          >
+                            <Archive className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        
+                        <button
+                          onClick={() => deleteLead(lead.id)}
+                          title="Delete Lead"
+                          className="p-2 bg-red-50/60 hover:bg-red-100/85 border border-red-200/50 text-red-600 rounded-xl transition-colors shadow-sm cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>

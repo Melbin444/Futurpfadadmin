@@ -155,32 +155,18 @@ export function TestimonialsView({
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">
-                      Origin Country {!isVideoOnly && "*"}
-                    </label>
-                    <input
-                      type="text"
-                      required={!isVideoOnly}
-                      value={activeTestimonial.origin || ""}
-                      onChange={(e) => setActiveTestimonial({ ...activeTestimonial, origin: e.target.value })}
-                      placeholder="e.g. India"
-                      className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">
-                      Flag Emoji {!isVideoOnly && "*"}
-                    </label>
-                    <input
-                      type="text"
-                      required={!isVideoOnly}
-                      value={activeTestimonial.flag || ""}
-                      onChange={(e) => setActiveTestimonial({ ...activeTestimonial, flag: e.target.value })}
-                      placeholder="e.g. 🇮🇳"
-                      className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner text-center font-sans text-sm"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">
+                    Origin Country {!isVideoOnly && "*"}
+                  </label>
+                  <input
+                    type="text"
+                    required={!isVideoOnly}
+                    value={activeTestimonial.origin || ""}
+                    onChange={(e) => setActiveTestimonial({ ...activeTestimonial, origin: e.target.value })}
+                    placeholder="e.g. India"
+                    className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
+                  />
                 </div>
 
                 <div>
@@ -195,6 +181,7 @@ export function TestimonialsView({
                     placeholder="e.g. Frankfurt am Main"
                     className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                   />
+                </div>
                 </div>
 
                 <div>
@@ -219,6 +206,11 @@ export function TestimonialsView({
                       />
                     </label>
                   </div>
+                  {activeTestimonial.img_url && (
+                    <div className="mt-3 rounded-2xl overflow-hidden border border-champagne/40 bg-[#faf9f6]/40 p-2 shadow-inner">
+                      <img src={activeTestimonial.img_url} alt="Candidate portrait preview" className="w-full h-36 object-contain rounded-xl mx-auto" />
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -237,26 +229,26 @@ export function TestimonialsView({
 
                 {!isVideoOnly && (
                   <div className="pt-2 border-t border-champagne/20 space-y-3">
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-0.5">Employer Metadata</h4>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-0.5">Employer Endorsement Info</h4>
                     <div>
-                      <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">Company Name *</label>
-                      <input
-                        type="text"
-                        required={!isVideoOnly}
-                        value={activeTestimonial.employer_name || ""}
-                        onChange={(e) => setActiveTestimonial({ ...activeTestimonial, employer_name: e.target.value })}
-                        placeholder="e.g. Main-Kinzig-Kliniken"
-                        className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">Employer Company URL *</label>
+                      <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">Employer Company Name *</label>
                       <input
                         type="text"
                         required={!isVideoOnly}
                         value={activeTestimonial.employer_company || ""}
                         onChange={(e) => setActiveTestimonial({ ...activeTestimonial, employer_company: e.target.value })}
-                        placeholder="e.g. MKK GmbH"
+                        placeholder="e.g. CareGroup Baden-Wuerttemberg"
+                        className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">Employer Contact Representative *</label>
+                      <input
+                        type="text"
+                        required={!isVideoOnly}
+                        value={activeTestimonial.employer_name || ""}
+                        onChange={(e) => setActiveTestimonial({ ...activeTestimonial, employer_name: e.target.value })}
+                        placeholder="e.g. Dr. Andreas Reinhardt"
                         className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                       />
                     </div>
@@ -267,7 +259,7 @@ export function TestimonialsView({
                         required={!isVideoOnly}
                         value={activeTestimonial.employer_city || ""}
                         onChange={(e) => setActiveTestimonial({ ...activeTestimonial, employer_city: e.target.value })}
-                        placeholder="e.g. Gelnhausen"
+                        placeholder="e.g. Stuttgart"
                         className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                       />
                     </div>
@@ -480,19 +472,27 @@ export function TestimonialsView({
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <span className="text-xl shrink-0 select-none">{test.flag}</span>
+                    {test.img_url ? (
+                      <div className="h-10 w-10 rounded-full overflow-hidden border border-champagne/60 shrink-0">
+                        <img src={test.img_url} alt={test.name} className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-[#f5f0e6] border border-champagne/60 flex items-center justify-center text-xl shrink-0">
+                        {test.flag || "🇩🇪"}
+                      </div>
+                    )}
                     <div>
                       <h4 className="text-sm font-bold text-navy-deep font-sans leading-tight">{test.name}</h4>
-                      <p className="text-[10px] text-slate-400 font-mono mt-0.5">From {test.origin} to {test.destination}</p>
+                      <p className="text-[10px] text-slate-450 font-mono mt-0.5">{test.flag || "🇩🇪"} From {test.origin} to {test.destination}</p>
                     </div>
                   </div>
                   <span className="text-[10.5px] font-bold text-[#b45309] font-serif leading-none mt-1">
-                    {test.employer_name}
+                    {test.employer_company}
                   </span>
                 </div>
                 <div className="bg-[#faf9f6]/50 border border-champagne/20 rounded-xl p-3.5">
                   <p className="text-[12px] font-serif italic text-navy/80 leading-relaxed">"{test.quote_en}"</p>
-                  <span className="text-[9.5px] text-slate-500 font-bold block mt-2">— {test.employer_role_en}</span>
+                  <span className="text-[9.5px] text-slate-500 font-bold block mt-2">— {test.employer_name} ({test.employer_role_en})</span>
                 </div>
               </div>
 

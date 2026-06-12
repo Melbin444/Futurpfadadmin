@@ -128,7 +128,6 @@ export function BlogsView({
                     className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                   />
                 </div>
-
                 <div>
                   <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">
                     Illustration Link
@@ -151,6 +150,11 @@ export function BlogsView({
                       />
                     </label>
                   </div>
+                  {activeBlog.img_url && (
+                    <div className="mt-3 rounded-2xl overflow-hidden border border-champagne/40 bg-[#faf9f6]/40 p-2 shadow-inner">
+                      <img src={activeBlog.img_url} alt="Blog preview" className="w-full h-36 object-contain rounded-xl mx-auto" />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -306,11 +310,16 @@ export function BlogsView({
           {blogs.map((blog) => (
             <div key={blog.id} className="glass-luxe p-6.5 rounded-[2rem] border border-white/60 shadow-soft flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
               <div className="space-y-4">
+                {blog.img_url && (
+                  <div className="w-full h-40 rounded-2xl overflow-hidden border border-champagne/30 mb-2 shadow-inner">
+                    <img src={blog.img_url} alt={blog.title_en} className="w-full h-full object-cover" />
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="inline-block px-3 py-1 bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-bold uppercase tracking-wider rounded-full">
                     {blog.category_en}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono">{blog.date}</span>
+                  <span className="text-[10px] text-slate-450 font-mono">{blog.date}</span>
                 </div>
                 <div>
                   <h4 className="text-[16px] font-serif font-bold text-navy-deep leading-snug">{blog.title_en}</h4>

@@ -274,6 +274,27 @@ export function useAdminEngine() {
       return;
     }
 
+    const flagMap: Record<string, string> = {
+      india: "🇮🇳",
+      indien: "🇮🇳",
+      colombia: "🇨🇴",
+      kolumbien: "🇨🇴",
+      china: "🇨🇳",
+      germany: "🇩🇪",
+      deutschland: "🇩🇪",
+      vietnam: "🇻🇳",
+      philippines: "🇵🇭",
+      nepal: "🇳🇵",
+      mexico: "🇲🇽",
+      brazil: "🇧🇷",
+      kenya: "🇰🇪",
+      tunisia: "🇹🇳",
+      egypt: "🇪🇬",
+      ukraine: "🇺🇦",
+    };
+    const country = (activeTestimonial.origin || "").toLowerCase().trim();
+    const derivedFlag = flagMap[country] || "🇩🇪";
+
     const isEditing = testimonials.some((t) => t.id === activeTestimonial.id);
     const method = isEditing ? "PUT" : "POST";
 
@@ -291,7 +312,7 @@ export function useAdminEngine() {
       employer_role_de: isVideoOnly ? "" : (activeTestimonial.employer_role_de || ""),
       employer_company: isVideoOnly ? "" : (activeTestimonial.employer_company || ""),
       employer_city: isVideoOnly ? "" : (activeTestimonial.employer_city || ""),
-      flag: activeTestimonial.flag || "🇩🇪",
+      flag: derivedFlag,
       origin: activeTestimonial.origin || "Germany",
       milestones_en: isVideoOnly ? [] : (activeTestimonial.milestones_en || []),
       milestones_de: isVideoOnly ? [] : (activeTestimonial.milestones_de || []),
