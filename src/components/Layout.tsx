@@ -56,8 +56,7 @@ export function Layout({
               { tab: "dashboard" as TabType, label: "Overview", icon: LayoutDashboard },
               { tab: "leads" as TabType, label: "Candidates Log", icon: Users, badge: stats?.newLeadsCount },
               { tab: "blogs" as TabType, label: "Relocation Blog", icon: BookOpen },
-              { tab: "testimonials" as TabType, label: "Placement Stories", icon: Award },
-              { tab: "faqs" as TabType, label: "B2B FAQ Catalog", icon: HelpCircle }
+              { tab: "testimonials" as TabType, label: "Placement Stories", icon: Award }
             ].map(({ tab, label, icon: Icon, badge }) => (
               <button
                 key={tab}

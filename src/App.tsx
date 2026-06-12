@@ -6,7 +6,6 @@ import { DashboardView } from "./components/DashboardView";
 import { LeadsView } from "./components/LeadsView";
 import { BlogsView } from "./components/BlogsView";
 import { TestimonialsView } from "./components/TestimonialsView";
-import { FaqsView } from "./components/FaqsView";
 
 export default function App() {
   const engine = useAdminEngine();
@@ -54,7 +53,6 @@ export default function App() {
           setIsLoading={engine.setIsLoading}
           setActiveBlog={engine.setActiveBlog}
           setActiveTestimonial={engine.setActiveTestimonial}
-          setActiveFaq={engine.setActiveFaq}
         />
       )}
 
@@ -95,18 +93,6 @@ export default function App() {
           deleteTestimonial={engine.deleteTestimonial}
           handleImageUpload={(e) => engine.handleImageUpload(e, "testimonial")}
           getYouTubeId={engine.getYouTubeId}
-        />
-      )}
-
-      {engine.activeTab === "faqs" && (
-        <FaqsView
-          faqs={engine.faqs}
-          activeFaq={engine.activeFaq}
-          setActiveFaq={engine.setActiveFaq}
-          saveFaq={engine.saveFaq}
-          deleteFaq={engine.deleteFaq}
-          slugify={engine.slugify}
-          statsCount={engine.stats?.faqsCount || 0}
         />
       )}
     </Layout>

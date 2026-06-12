@@ -37,11 +37,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const newLeadsRes = await db.prepare("SELECT COUNT(*) as count FROM leads WHERE status = 'new'").first<{ count: number }>();
     const blogsRes = await db.prepare("SELECT COUNT(*) as count FROM blogs").first<{ count: number }>();
     const testimonialsRes = await db.prepare("SELECT COUNT(*) as count FROM testimonials").first<{ count: number }>();
-    const faqsRes = await db.prepare("SELECT COUNT(*) as count FROM faqs").first<{ count: number }>();
 
     console.log(
       `[Admin Stats API] Metrics retrieved - Leads: ${leadsRes?.count ?? 0} (New: ${newLeadsRes?.count ?? 0}), ` +
-      `Blogs: ${blogsRes?.count ?? 0}, Testimonials: ${testimonialsRes?.count ?? 0}, FAQs: ${faqsRes?.count ?? 0}`
+      `Blogs: ${blogsRes?.count ?? 0}, Testimonials: ${testimonialsRes?.count ?? 0}`
     );
 
     return new Response(
@@ -50,7 +49,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         newLeadsCount: newLeadsRes?.count ?? 0,
         blogsCount: blogsRes?.count ?? 0,
         testimonialsCount: testimonialsRes?.count ?? 0,
-        faqsCount: faqsRes?.count ?? 0,
       }),
       {
         headers: { "Content-Type": "application/json" },

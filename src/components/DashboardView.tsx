@@ -21,7 +21,6 @@ interface DashboardViewProps {
   setIsLoading: (val: boolean) => void;
   setActiveBlog: (val: any) => void;
   setActiveTestimonial: (val: any) => void;
-  setActiveFaq: (val: any) => void;
 }
 
 export function DashboardView({
@@ -31,7 +30,6 @@ export function DashboardView({
   setIsLoading,
   setActiveBlog,
   setActiveTestimonial,
-  setActiveFaq,
 }: DashboardViewProps) {
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -49,18 +47,17 @@ export function DashboardView({
             Welcome to your <span className="font-serif-it gold-gradient-text">Publishing Portal</span>.
           </h2>
           <p className="text-slate-650 text-[13px] leading-relaxed font-light max-w-xl">
-            Configure and publish legal relocation guides, placement updates, FAQ structures, and applicant tracking. Changes are committed instantly to Cloudflare D1 Edge databases for zero cold-start delivery.
+            Configure and publish legal relocation guides, placement updates, and applicant tracking. Changes are committed instantly to Cloudflare D1 Edge databases for zero cold-start delivery.
           </p>
         </div>
       </div>
 
       {/* Metric Card Certificates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
           { tab: "leads" as TabType, label: "Candidate Inquiries", value: stats?.leadsCount, icon: Users, sub: "Inquiry database", badge: stats?.newLeadsCount },
           { tab: "blogs" as TabType, label: "Blog articles", value: stats?.blogsCount, icon: BookOpen, sub: "Relocation guides" },
-          { tab: "testimonials" as TabType, label: "Placement Stories", value: stats?.testimonialsCount, icon: Award, sub: "Relocations mapped" },
-          { tab: "faqs" as TabType, label: "Defined FAQs", value: stats?.faqsCount, icon: HelpCircle, sub: "Bilingual items" }
+          { tab: "testimonials" as TabType, label: "Placement Stories", value: stats?.testimonialsCount, icon: Award, sub: "Relocations mapped" }
         ].map(({ tab, label, value, icon: Icon, sub, badge }) => (
           <div
             key={tab}
@@ -152,7 +149,7 @@ export function DashboardView({
           <div className="space-y-4">
             <h3 className="text-[15px] font-bold text-navy font-serif">Publishing shortcuts</h3>
             <p className="text-slate-650 text-[12.5px] font-light leading-relaxed">
-              Instantly populate new relocation articles, relocation timelines, or FAQ structures using the bilingual wizard terminals.
+              Instantly populate new relocation articles or relocation timelines using the bilingual wizard terminals.
             </p>
           </div>
           
@@ -192,23 +189,6 @@ export function DashboardView({
               <span className="flex items-center gap-3">
                 <Plus className="h-4 w-4 text-[#d97706]" />
                 Add Relocation Story
-              </span>
-              <ChevronRight className="h-3.5 w-3.5 text-slate-350" />
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveFaq({
-                  id: `faq-${Date.now().toString().slice(-4)}`,
-                  order_index: (stats?.faqsCount || 0) + 1,
-                });
-                setActiveTab("faqs");
-              }}
-              className="w-full flex items-center justify-between p-4 border border-champagne/60 bg-[#faf9f6]/60 hover:bg-white rounded-2xl text-[9px] font-bold uppercase tracking-[0.12em] text-navy transition-all duration-300 hover:border-gold/30 hover:shadow-sm cursor-pointer"
-            >
-              <span className="flex items-center gap-3">
-                <Plus className="h-4 w-4 text-[#d97706]" />
-                Create FAQ Entry
               </span>
               <ChevronRight className="h-3.5 w-3.5 text-slate-350" />
             </button>

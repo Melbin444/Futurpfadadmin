@@ -48,21 +48,12 @@ export interface Testimonial {
   milestones_de: string | string[];
 }
 
-export interface Faq {
-  id: string;
-  question_en: string;
-  question_de: string;
-  answer_en: string;
-  answer_de: string;
-  order_index: number;
-}
-
 export interface DashboardStats {
   leadsCount: number;
   newLeadsCount: number;
   blogsCount: number;
   testimonialsCount: number;
-  faqsCount: number;
 }
 
-export type TabType = "dashboard" | "leads" | "blogs" | "testimonials" | "faqs";
+export type TabType = "dashboard" | "leads" | "blogs" | "testimonials";
+

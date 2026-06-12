@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Lead, Blog, Testimonial, Faq, DashboardStats, TabType } from "./types";
+import { Lead, Blog, Testimonial, DashboardStats, TabType } from "./types";
 
 function getYouTubeId(url?: string): string | null {
   if (!url) return null;
@@ -13,7 +13,7 @@ export function useAdminEngine() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentHash, setCurrentHash] = useState<string>(() => {
     const hash = window.location.hash;
-    return hash && ["#dashboard", "#leads", "#blogs", "#testimonials", "#faqs"].includes(hash)
+    return hash && ["#dashboard", "#leads", "#blogs", "#testimonials"].includes(hash)
       ? hash
       : "#dashboard";
   });
@@ -21,7 +21,7 @@ export function useAdminEngine() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash && ["#dashboard", "#leads", "#blogs", "#testimonials", "#faqs"].includes(hash)) {
+      if (hash && ["#dashboard", "#leads", "#blogs", "#testimonials"].includes(hash)) {
         setCurrentHash(hash);
       } else {
         setCurrentHash("#dashboard");
@@ -44,7 +44,6 @@ export function useAdminEngine() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [faqs, setFaqs] = useState<Faq[]>([]);
 
   // Search/Filter states
   const [leadsFilter, setLeadsFilter] = useState<"all" | "new" | "contacted" | "archived">("all");
@@ -64,7 +63,6 @@ export function useAdminEngine() {
     }
   }, [activeTestimonial]);
   
-  const [activeFaq, setActiveFaq] = useState<Partial<Faq> | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   // UI state
@@ -164,9 +162,6 @@ export function useAdminEngine() {
             milestones_de: typeof t.milestones_de === "string" ? JSON.parse(t.milestones_de) : t.milestones_de,
           })));
         }
-      } else if (activeTab === "faqs") {
-        const res = await fetch("/api/faqs");
-        if (res.ok) setFaqs(await res.json());
       }
     } catch (e) {
       toast.error(`Error synchronizing ${activeTab} directory`);
@@ -339,53 +334,7 @@ export function useAdminEngine() {
     }
   };
 
-  const saveFaq = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeFaq) return;
-    if (!activeFaq.id || !activeFaq.question_en || !activeFaq.question_de) {
-      toast.error("Identifier and questions are required");
-      return;
-    }
 
-    const isEditing = faqs.some((f) => f.id === activeFaq.id);
-    const method = isEditing ? "PUT" : "POST";
-
-    try {
-      const res = await fetch("/api/faqs", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(activeFaq),
-      });
-
-      const data = await res.json();
-      if (res.ok && (data.success || !data.error)) {
-        toast.success(`FAQ catalog entry ${isEditing ? "updated" : "published"} successfully`);
-        setActiveFaq(null);
-        loadTabContent();
-        loadStats();
-      } else {
-        toast.error(data.error || "Failed to save FAQ catalog entry");
-      }
-    } catch (e) {
-      toast.error("Error saving FAQ catalog entry");
-    }
-  };
-
-  const deleteFaq = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this FAQ entry?")) return;
-    try {
-      const res = await fetch(`/api/faqs?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        toast.success("FAQ catalog entry deleted");
-        loadTabContent();
-        loadStats();
-      } else {
-        toast.error("Failed to delete FAQ catalog entry");
-      }
-    } catch (e) {
-      toast.error("Error deleting FAQ entry");
-    }
-  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'blog' | 'testimonial') => {
     const file = e.target.files?.[0];
@@ -436,7 +385,6 @@ export function useAdminEngine() {
     leads,
     blogs,
     testimonials,
-    faqs,
     leadsFilter,
     setLeadsFilter,
     searchTerm,
@@ -447,8 +395,6 @@ export function useAdminEngine() {
     setActiveTestimonial,
     isVideoOnly,
     setIsVideoOnly,
-    activeFaq,
-    setActiveFaq,
     selectedLead,
     setSelectedLead,
     isLoading,
@@ -464,8 +410,6 @@ export function useAdminEngine() {
     deleteBlog,
     saveTestimonial,
     deleteTestimonial,
-    saveFaq,
-    deleteFaq,
     handleImageUpload,
     slugify,
     getYouTubeId,
