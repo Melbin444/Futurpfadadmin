@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Search, X, Check, Archive, Trash2, Mail, Phone } from "lucide-react";
 import { Lead } from "../engines/types";
 
@@ -192,7 +193,7 @@ export function LeadsView({
       </div>
 
       {/* LEAD DETAILS DRAWER MODAL */}
-      {selectedLead && (
+      {selectedLead && createPortal(
         <div className="fixed inset-0 bg-navy/20 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fadeIn">
           <div className="w-full max-w-xl glass-strong border border-white rounded-[2.5rem] p-8 sm:p-10 shadow-luxe space-y-6 text-navy">
             
@@ -253,7 +254,8 @@ export function LeadsView({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

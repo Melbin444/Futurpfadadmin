@@ -9,6 +9,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { TabType, DashboardStats } from "../engines/types";
+import logoImg from "../assets/logo.png";
 
 interface LayoutProps {
   activeTab: TabType;
@@ -42,8 +43,8 @@ export function Layout({
           {/* Brand header */}
           <div className="flex items-center justify-between lg:justify-start lg:gap-3.5 pb-4 lg:pb-5 border-b border-champagne/40 w-full">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 lg:h-11 lg:w-11 bg-[#0c1c30] rounded-2xl flex items-center justify-center font-bold text-white shadow shadow-sky-950/20 text-base lg:text-lg">
-                🧭
+              <div className="h-10 w-10 lg:h-11 lg:w-11 bg-white rounded-2xl overflow-hidden flex items-center justify-center border border-slate-200 shadow shadow-sky-950/5">
+                <img src={logoImg} alt="Futurpfad Logo" className="h-full w-full object-contain" />
               </div>
               <div>
                 <h2 className="font-bold text-navy leading-none tracking-tight text-xs lg:text-sm">Futurpfad</h2>
