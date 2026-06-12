@@ -1,0 +1,61 @@
+import { verifyAuth } from "./auth";
+
+interface Env {
+  DB: any;
+  ADMIN_PASSWORD?: string;
+}
+
+export const onRequest: PagesFunction<Env> = async (context) => {
+  const { request, env } = context;
+
+  // 1. Verify authentication
+  const authenticated = await verifyAuth(request, env);
+  if (!authenticated) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (request.method !== "GET") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const db = env.DB;
+    if (!db) {
+      throw new Error("D1 Database connection (DB) not bound");
+    }
+
+    // Run queries in parallel or batch
+    const leadsRes = await db.prepare("SELECT COUNT(*) as count FROM leads").first<{ count: number }>();
+    const newLeadsRes = await db.prepare("SELECT COUNT(*) as count FROM leads WHERE status = 'new'").first<{ count: number }>();
+    const blogsRes = await db.prepare("SELECT COUNT(*) as count FROM blogs").first<{ count: number }>();
+    const testimonialsRes = await db.prepare("SELECT COUNT(*) as count FROM testimonials").first<{ count: number }>();
+    const faqsRes = await db.prepare("SELECT COUNT(*) as count FROM faqs").first<{ count: number }>();
+
+    return new Response(
+      JSON.stringify({
+        leadsCount: leadsRes?.count ?? 0,
+        newLeadsCount: newLeadsRes?.count ?? 0,
+        blogsCount: blogsRes?.count ?? 0,
+        testimonialsCount: testimonialsRes?.count ?? 0,
+        faqsCount: faqsRes?.count ?? 0,
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: "Database error: " + (error as Error).message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};

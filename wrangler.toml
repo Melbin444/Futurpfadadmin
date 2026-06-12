@@ -1,0 +1,9 @@
+#:schema ../node_modules/wrangler/config-schema.json
+name = "futurpfad-admin"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "DB"
+database_id = "6b180f17-a40d-4c41-acb4-b87d93f9178c"
+remote = true
