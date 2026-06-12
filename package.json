@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "wrangler pages dev dist",
+    "server": "wrangler pages dev dist --persist-to ../.wrangler/state",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
