@@ -56,11 +56,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       logDebug(`[4] File constructor name: ${file.constructor?.name}`);
       logDebug(`[5] File has arrayBuffer: ${"arrayBuffer" in file}`);
       logDebug(`[6] File name: ${(file as any).name}, size: ${(file as any).size}, type: ${(file as any).type}`);
+    } else if (file && typeof file === "string") {
+      logDebug(`[4-Raw] File is raw string. Length: ${file.length}`);
     }
 
     // Convert the streaming File object into a Base64 Data URI
-    // This bypasses any limitations or bugs in the Cloudflare Workers runtime
-    // regarding binary Blob serialization inside FormData fetch requests
+    // Supports both standards-compliant File objects and legacy raw strings
     let dataUri = "";
     if (file && typeof file === "object" && "arrayBuffer" in file) {
       try {
@@ -88,10 +89,51 @@ export const onRequest: PagesFunction<Env> = async (context) => {
           headers: { "Content-Type": "application/json" },
         });
       }
+    } else if (file && typeof file === "string") {
+      try {
+        logDebug("[7-Raw] Reconstructing binary byte array from raw string");
+        const bytes = new Uint8Array(file.length);
+        for (let i = 0; i < file.length; i++) {
+          bytes[i] = file.charCodeAt(i) & 0xff;
+        }
+        let binary = "";
+        const chunk_size = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunk_size) {
+          const chunk = bytes.subarray(i, i + chunk_size);
+          binary += String.fromCharCode.apply(null, chunk as any);
+        }
+        const base64 = btoa(binary);
+        
+        // Sniff MIME type using char codes
+        let mimeType = "image/png";
+        if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+          mimeType = "image/png";
+        } else if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+          mimeType = "image/jpeg";
+        } else if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
+          mimeType = "image/gif";
+        } else if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) {
+          mimeType = "image/webp";
+        } else if (file.includes("<svg") || file.includes("xmlns=\"http://www.w3.org/2000/svg\"")) {
+          mimeType = "image/svg+xml";
+        }
+
+        dataUri = `data:${mimeType};base64,${base64}`;
+        logDebug(`[8-Raw] Raw string Base64 conversion successful. Sniffed MIME type: ${mimeType}, dataUri length: ${dataUri.length}`);
+      } catch (err: any) {
+        logDebug(`[7-Raw-Err] Raw string conversion failed: ${err.message}`);
+        return new Response(JSON.stringify({ 
+          error: "Failed to process raw string data: " + err.message, 
+          debugLogs 
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     } else {
-      logDebug("[7-Err] File is not an object or does not contain arrayBuffer");
+      logDebug("[7-Err] File is not an object or a valid string");
       return new Response(JSON.stringify({ 
-        error: "Invalid file format: file must be a binary File/Blob object", 
+        error: "Invalid file format: file must be a binary File/Blob object or binary string", 
         debugLogs 
       }), {
         status: 400,
