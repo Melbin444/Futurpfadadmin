@@ -4,8 +4,7 @@ import {
   Users,
   BookOpen,
   Award,
-  LogOut,
-  ExternalLink
+  LogOut
 } from "lucide-react";
 import { TabType, DashboardStats } from "../engines/types";
 import logoImg from "../assets/logo.png";
@@ -116,17 +115,6 @@ export function Layout({
             {isLoading && (
               <div className="h-3.5 w-3.5 lg:h-4 lg:w-4 border-2 border-t-amber-600 border-r-amber-600 border-b-champagne border-l-champagne rounded-full animate-spin shrink-0" />
             )}
-          </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-[#b45309] hover:text-amber-800 transition-colors"
-            >
-              <span>Public Site</span>
-              <ExternalLink className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
-            </a>
           </div>
         </header>
 
