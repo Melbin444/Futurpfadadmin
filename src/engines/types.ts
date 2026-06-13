@@ -42,6 +42,7 @@ export interface Testimonial {
   employer_role_de: string;
   employer_company: string;
   employer_city: string;
+  employer_img_url?: string;
   img_url?: string;
   video_url?: string;
   milestones_en: string | string[];

@@ -54,14 +54,20 @@ export function useAdminEngine() {
   const [activeTestimonial, setActiveTestimonial] = useState<Partial<Testimonial> | null>(null);
   const [isVideoOnly, setIsVideoOnly] = useState(false);
 
+  const [lastLoadedId, setLastLoadedId] = useState<string | null>(null);
+
   useEffect(() => {
     if (activeTestimonial) {
-      const isVid = !!activeTestimonial.video_url && (!activeTestimonial.role_en || activeTestimonial.role_en.trim() === "");
-      setIsVideoOnly(isVid);
+      if (activeTestimonial.id !== lastLoadedId) {
+        setLastLoadedId(activeTestimonial.id || "");
+        const isVid = !!activeTestimonial.video_url && (!activeTestimonial.role_en || activeTestimonial.role_en.trim() === "");
+        setIsVideoOnly(isVid);
+      }
     } else {
+      setLastLoadedId(null);
       setIsVideoOnly(false);
     }
-  }, [activeTestimonial]);
+  }, [activeTestimonial, lastLoadedId]);
   
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
@@ -312,6 +318,7 @@ export function useAdminEngine() {
       employer_role_de: isVideoOnly ? "" : (activeTestimonial.employer_role_de || ""),
       employer_company: isVideoOnly ? "" : (activeTestimonial.employer_company || ""),
       employer_city: isVideoOnly ? "" : (activeTestimonial.employer_city || ""),
+      employer_img_url: isVideoOnly ? "" : (activeTestimonial.employer_img_url || ""),
       flag: derivedFlag,
       origin: activeTestimonial.origin || "Germany",
       milestones_en: isVideoOnly ? [] : (activeTestimonial.milestones_en || []),
@@ -357,7 +364,7 @@ export function useAdminEngine() {
 
 
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'blog' | 'testimonial') => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'blog' | 'testimonial' | 'employer') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -378,9 +385,13 @@ export function useAdminEngine() {
           if (activeBlog) {
             setActiveBlog({ ...activeBlog, img_url: data.url });
           }
-        } else {
+        } else if (type === 'testimonial') {
           if (activeTestimonial) {
             setActiveTestimonial({ ...activeTestimonial, img_url: data.url });
+          }
+        } else if (type === 'employer') {
+          if (activeTestimonial) {
+            setActiveTestimonial({ ...activeTestimonial, employer_img_url: data.url });
           }
         }
         toast.success("Image uploaded successfully!", { id: toastId });

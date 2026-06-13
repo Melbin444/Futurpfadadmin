@@ -22,6 +22,7 @@ interface TestimonialData {
   employer_role_de: string;
   employer_company: string;
   employer_city: string;
+  employer_img_url?: string;
   img_url?: string;
   video_url?: string;
   milestones_en?: string | any[];
@@ -133,8 +134,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
             id, name, origin, flag, role_en, role_de, destination, 
             sector_en, sector_de, quote_en, quote_de, employer_name, 
             employer_role_en, employer_role_de, employer_company, 
-            employer_city, img_url, video_url, milestones_en, milestones_de
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            employer_city, employer_img_url, img_url, video_url, milestones_en, milestones_de
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .bind(
           data.id,
@@ -153,6 +154,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
           data.employer_role_de || "",
           data.employer_company || "",
           data.employer_city || "",
+          data.employer_img_url || null,
           data.img_url || null,
           data.video_url || null,
           stringifyMilestones(data.milestones_en),
@@ -192,7 +194,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
             name = ?, origin = ?, flag = ?, role_en = ?, role_de = ?, destination = ?, 
             sector_en = ?, sector_de = ?, quote_en = ?, quote_de = ?, employer_name = ?, 
             employer_role_en = ?, employer_role_de = ?, employer_company = ?, 
-            employer_city = ?, img_url = ?, video_url = ?, milestones_en = ?, milestones_de = ?
+            employer_city = ?, employer_img_url = ?, img_url = ?, video_url = ?, milestones_en = ?, milestones_de = ?
           WHERE id = ?`
         )
         .bind(
@@ -211,6 +213,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
           data.employer_role_de,
           data.employer_company,
           data.employer_city,
+          data.employer_img_url || null,
           data.img_url || null,
           data.video_url || null,
           stringifyMilestones(data.milestones_en),

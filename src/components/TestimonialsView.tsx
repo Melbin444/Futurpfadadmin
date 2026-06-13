@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, ArrowLeft, Video, Edit, Trash2 } from "lucide-react";
+import { Plus, ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { Testimonial } from "../engines/types";
 
 interface TestimonialsViewProps {
@@ -10,7 +10,7 @@ interface TestimonialsViewProps {
   setIsVideoOnly: (val: boolean) => void;
   saveTestimonial: (e: React.FormEvent) => Promise<void>;
   deleteTestimonial: (id: string) => Promise<void>;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'testimonial') => Promise<void>;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'testimonial' | 'employer') => Promise<void>;
   getYouTubeId: (url?: string) => string | null;
 }
 
@@ -225,6 +225,24 @@ export function TestimonialsView({
                     placeholder="e.g. https://www.youtube.com/watch?v=..."
                     className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                   />
+                  {activeTestimonial.video_url && (() => {
+                    const ytId = getYouTubeId(activeTestimonial.video_url);
+                    if (ytId) {
+                      return (
+                        <div className="mt-3 rounded-2xl overflow-hidden border border-champagne/45 bg-[#071324] shadow-md aspect-video relative animate-fadeIn">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                            title="Edit Video Preview"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
 
                 {!isVideoOnly && (
@@ -262,6 +280,41 @@ export function TestimonialsView({
                         placeholder="e.g. Stuttgart"
                         className="w-full bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-[8.5px] font-bold text-slate-450 uppercase tracking-widest mb-2 pl-1">
+                        Employer Profile Image
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={activeTestimonial.employer_img_url || ""}
+                          onChange={(e) => setActiveTestimonial({ ...activeTestimonial, employer_img_url: e.target.value })}
+                          placeholder="Optional avatar URL"
+                          className="flex-1 bg-[#faf9f6]/70 border border-champagne/70 focus:border-gold focus:ring-1 focus:ring-gold text-navy rounded-2xl px-4 py-3.5 text-xs outline-none transition-all shadow-inner"
+                        />
+                        <label className="flex items-center justify-center bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-2xl px-4 py-3.5 text-xs font-bold cursor-pointer transition-all shadow-sm">
+                          <span>Upload</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleImageUpload(e, 'employer')}
+                          />
+                        </label>
+                      </div>
+                      {activeTestimonial.employer_img_url && (
+                        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-champagne/45 bg-[#faf9f6]/40 p-2 shadow-inner">
+                          <img
+                            src={activeTestimonial.employer_img_url}
+                            alt="Employer avatar preview"
+                            className="h-10 w-10 rounded-full object-cover border border-champagne"
+                          />
+                          <span className="text-[10px] text-slate-500 font-mono overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
+                            {activeTestimonial.employer_img_url}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -466,95 +519,134 @@ export function TestimonialsView({
         </div>
       ) : (
         /* CARDS LIST */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {testimonials.map((test) => (
-            <div key={test.id} className="group glass-luxe rounded-[2.2rem] border border-white/70 shadow-soft hover:shadow-luxe hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
-              <div className="p-6.5 space-y-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {testimonials.map((test) => {
+            const ytId = test.video_url ? getYouTubeId(test.video_url) : null;
+            return (
+              <div key={test.id} className="group glass-luxe rounded-[2.5rem] border border-white/80 shadow-soft hover:shadow-luxe hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between overflow-hidden bg-white/60">
                 
-                {/* Header Profile Section */}
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex items-center gap-4">
-                    {test.img_url ? (
-                      <div className="h-12 w-12 rounded-2xl overflow-hidden border border-champagne shadow-sm shrink-0">
-                        <img src={test.img_url} alt={test.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                {/* Main Card Content */}
+                <div className="p-6 sm:p-8 space-y-6">
+                  
+                  {/* Candidate Profile Header */}
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex items-center gap-4">
+                      {test.img_url ? (
+                        <div className="h-14 w-14 rounded-2xl overflow-hidden border-2 border-champagne shadow-sm shrink-0">
+                          <img src={test.img_url} alt={test.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      ) : (
+                        <div className="h-14 w-14 rounded-2xl bg-[#faf6ee] border-2 border-champagne/80 flex items-center justify-center text-3xl shrink-0 shadow-inner">
+                          {test.flag || "🇩🇪"}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="text-base font-bold text-navy-deep font-sans leading-snug">{test.name}</h4>
+                        <p className="text-[11px] text-slate-450 font-semibold tracking-wide mt-0.5">
+                          {test.flag || "🇩🇪"} {test.origin} &rarr; <span className="text-teal font-bold">{test.destination}</span>
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-light mt-0.5">
+                          {test.role_en || "Video-Only Testimonial"}
+                        </p>
                       </div>
-                    ) : (
-                      <div className="h-12 w-12 rounded-2xl bg-[#faf6ee] border border-champagne/80 flex items-center justify-center text-2xl shrink-0 shadow-inner">
-                        {test.flag || "🇩🇪"}
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-base font-bold text-navy-deep font-sans leading-snug">{test.name}</h4>
-                      <p className="text-[10.5px] text-slate-450 font-medium tracking-wide mt-0.5">
-                        {test.flag || "🇩🇪"} {test.origin} &rarr; {test.destination}
-                      </p>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="inline-block px-2.5 py-1 bg-amber-50/80 border border-amber-100 text-[#b45309] text-[8.5px] font-extrabold uppercase tracking-wider rounded-full shadow-sm">
-                      {test.employer_company}
+                    
+                    <span className="inline-block px-3 py-1 bg-amber-50/80 border border-amber-100/50 text-[#b45309] text-[9px] font-extrabold uppercase tracking-wider rounded-full shadow-sm shrink-0">
+                      {test.sector_en || "Video-Only"}
                     </span>
                   </div>
-                </div>
 
-                {/* Review Quote Block */}
-                <div className="relative bg-[#faf9f6]/95 border border-champagne/25 rounded-2xl p-4.5 shadow-sm">
-                  {/* Small decorative quote icon */}
-                  <span className="absolute top-2 right-4 text-3xl font-serif text-amber-600/10 select-none pointer-events-none">“</span>
-                  <p className="text-[12.5px] font-serif-it font-light text-navy/90 leading-relaxed italic pr-4">
-                    "{test.quote_en}"
-                  </p>
-                  <div className="mt-3 pt-2 border-t border-champagne/20 flex justify-between items-center">
-                    <span className="text-[9.5px] text-slate-500 font-bold">— {test.employer_name}</span>
-                    <span className="text-[9px] text-[#b45309] font-medium font-mono uppercase">{test.employer_role_en}</span>
-                  </div>
-                </div>
-
-                {/* Milestones count preview */}
-                {Array.isArray(test.milestones_en) && test.milestones_en.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-widest">Milestones:</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {test.milestones_en.map((_, idx) => (
-                        <span key={idx} className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Milestone completed" />
-                      ))}
+                  {/* Video Preview Block (if video_url is present) */}
+                  {ytId && (
+                    <div className="relative w-full aspect-video rounded-2xl border border-champagne/60 bg-[#071324] overflow-hidden shadow-md group/video">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                        title={`Video preview of ${test.name}`}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
 
-              {/* Footer Controls */}
-              <div className="mx-6 mb-6 pt-4 border-t border-champagne/30 flex justify-between items-center shrink-0">
-                <div className="flex gap-2">
-                  <span className="inline-block px-3 py-1 bg-[#f5f0e6] border border-champagne/60 text-[#b45309] text-[9px] font-bold rounded-full">
-                    {test.sector_en}
-                  </span>
-                  {test.video_url && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-655 text-[9px] font-bold rounded-full border border-red-100">
-                      <Video className="h-3.5 w-3.5 shrink-0" />
-                      Video
-                    </span>
+                  {/* Review Quote Block with Employer Profile Image */}
+                  {(test.quote_en || test.employer_name) && (
+                    <div className="relative bg-[#faf9f6]/95 border border-champagne/30 rounded-[1.8rem] p-5 shadow-sm space-y-4">
+                      {test.quote_en && (
+                        <div>
+                          <span className="absolute top-2 right-4 text-4xl font-serif text-amber-600/10 select-none pointer-events-none">“</span>
+                          <p className="text-[13px] font-serif-it font-light text-navy/90 leading-relaxed italic pr-4">
+                            "{test.quote_en}"
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="pt-3 border-t border-champagne/20 flex items-center gap-3">
+                        {test.employer_img_url ? (
+                          <img
+                            src={test.employer_img_url}
+                            alt={test.employer_name}
+                            className="h-10 w-10 rounded-full object-cover border-2 border-champagne shadow-sm shrink-0"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-amber-100 text-[#b45309] flex items-center justify-center font-bold text-[12px] border border-champagne shrink-0">
+                            {test.employer_name ? test.employer_name[0] : "?"}
+                          </div>
+                        )}
+                        <div className="leading-tight">
+                          <h5 className="font-bold text-[12px] text-navy-deep">{test.employer_name}</h5>
+                          <p className="text-[10px] text-teal font-semibold mt-0.5">
+                            {test.employer_company} &bull; <span className="text-slate-400 font-light">{test.employer_role_en}</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Milestones Preview */}
+                  {Array.isArray(test.milestones_en) && test.milestones_en.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Integration Journey:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {test.milestones_en.map((m, idx) => (
+                          <div key={idx} className="flex items-center gap-1 text-[9.5px] text-[#475569] bg-slate-50 border border-slate-200/50 px-2 py-0.5 rounded-full">
+                            <span className="h-1 w-1 rounded-full bg-emerald-500" />
+                            <span>{m}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setActiveTestimonial(test)}
-                    title="Edit Placement Profile"
-                    className="p-2 bg-white hover:bg-amber-50 border border-champagne hover:border-amber-250 rounded-xl text-slate-555 hover:text-[#b45309] transition-all shadow-sm cursor-pointer active:scale-95"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteTestimonial(test.id)}
-                    title="Delete Profile"
-                    className="p-2 bg-red-50/50 hover:bg-red-100/80 border border-red-200/50 hover:border-red-300/50 rounded-xl text-red-600 transition-all shadow-sm cursor-pointer active:scale-95"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+
+                {/* Footer Controls */}
+                <div className="mx-6 sm:mx-8 mb-6 sm:mb-8 pt-4 border-t border-champagne/30 flex justify-between items-center shrink-0">
+                  <div className="flex gap-2">
+                    <span className="inline-block px-3 py-1 bg-[#f5f0e6] border border-champagne/60 text-[#b45309] text-[9.5px] font-bold rounded-full">
+                      ID: {test.id}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveTestimonial(test)}
+                      title="Edit Placement Profile"
+                      className="p-2 bg-white hover:bg-amber-50 border border-champagne hover:border-amber-250 rounded-xl text-slate-555 hover:text-[#b45309] transition-all shadow-sm cursor-pointer active:scale-95"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteTestimonial(test.id)}
+                      title="Delete Profile"
+                      className="p-2 bg-red-50/50 hover:bg-red-100/80 border border-red-200/50 hover:border-red-300/50 rounded-xl text-red-600 transition-all shadow-sm cursor-pointer active:scale-95"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
