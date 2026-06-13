@@ -40,15 +40,22 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Convert the streaming File object into an ArrayBuffer and then a standard Blob
-    // This resolves issues in the Cloudflare Pages/workerd production environment
-    // where passing a streaming File object directly into FormData stringifies it
-    let fileBlob: Blob;
-    let fileName = "upload.bin";
+    // Convert the streaming File object into a Base64 Data URI
+    // This bypasses any limitations or bugs in the Cloudflare Workers runtime
+    // regarding binary Blob serialization inside FormData fetch requests
+    let dataUri = "";
     if (file && typeof file === "object" && "arrayBuffer" in file) {
       const arrayBuffer = await (file as any).arrayBuffer();
-      fileBlob = new Blob([arrayBuffer], { type: (file as any).type });
-      fileName = (file as any).name || "upload.bin";
+      const uint8 = new Uint8Array(arrayBuffer);
+      let binary = "";
+      const chunk_size = 0x8000; // 32KB chunks
+      for (let i = 0; i < uint8.length; i += chunk_size) {
+        const chunk = uint8.subarray(i, i + chunk_size);
+        binary += String.fromCharCode.apply(null, chunk as any);
+      }
+      const base64 = btoa(binary);
+      const mimeType = (file as any).type || "image/png";
+      dataUri = `data:${mimeType};base64,${base64}`;
     } else {
       console.warn("[Admin Upload API] Upload rejected: Invalid file format");
       return new Response(JSON.stringify({ error: "Invalid file uploaded" }), {
@@ -94,7 +101,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     // Prepare multipart payload to send to Cloudinary
     const cloudinaryFormData = new FormData();
-    cloudinaryFormData.append("file", fileBlob, fileName);
+    cloudinaryFormData.append("file", dataUri);
     cloudinaryFormData.append("api_key", apiKey);
     cloudinaryFormData.append("timestamp", timestamp);
     cloudinaryFormData.append("signature", signature);
