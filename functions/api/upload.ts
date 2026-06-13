@@ -40,9 +40,36 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const cloudName = env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = env.CLOUDINARY_API_KEY;
-    const apiSecret = env.CLOUDINARY_API_SECRET;
+    // Convert the streaming File object into an ArrayBuffer and then a standard Blob
+    // This resolves issues in the Cloudflare Pages/workerd production environment
+    // where passing a streaming File object directly into FormData stringifies it
+    let fileBlob: Blob;
+    let fileName = "upload.bin";
+    if (file && typeof file === "object" && "arrayBuffer" in file) {
+      const arrayBuffer = await (file as any).arrayBuffer();
+      fileBlob = new Blob([arrayBuffer], { type: (file as any).type });
+      fileName = (file as any).name || "upload.bin";
+    } else {
+      console.warn("[Admin Upload API] Upload rejected: Invalid file format");
+      return new Response(JSON.stringify({ error: "Invalid file uploaded" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Helper to sanitize environment variables (strip quotes and spaces)
+    const cleanValue = (val?: string) => {
+      if (!val) return "";
+      let s = val.trim();
+      if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+        s = s.slice(1, -1);
+      }
+      return s.trim();
+    };
+
+    const cloudName = cleanValue(env.CLOUDINARY_CLOUD_NAME);
+    const apiKey = cleanValue(env.CLOUDINARY_API_KEY);
+    const apiSecret = cleanValue(env.CLOUDINARY_API_SECRET);
 
     if (!cloudName || !apiKey || !apiSecret) {
       console.error("[Admin Upload API] Upload failed: Cloudinary environment variables not configured in Pages project dashboard");
@@ -67,7 +94,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     // Prepare multipart payload to send to Cloudinary
     const cloudinaryFormData = new FormData();
-    cloudinaryFormData.append("file", file);
+    cloudinaryFormData.append("file", fileBlob, fileName);
     cloudinaryFormData.append("api_key", apiKey);
     cloudinaryFormData.append("timestamp", timestamp);
     cloudinaryFormData.append("signature", signature);
@@ -86,7 +113,19 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     
     if (!response.ok) {
       console.error("[Admin Upload API] Cloudinary API returned error:", JSON.stringify(resData.error));
-      return new Response(JSON.stringify({ error: resData.error?.message || "Cloudinary upload failed" }), {
+      
+      const obscuredSecret = apiSecret.length > 4 
+        ? `${apiSecret.slice(0, 2)}...${apiSecret.slice(-2)} (len: ${apiSecret.length})` 
+        : `len: ${apiSecret.length}`;
+      const obscuredKey = apiKey.length > 4
+        ? `${apiKey.slice(0, 2)}...${apiKey.slice(-2)} (len: ${apiKey.length})`
+        : `len: ${apiKey.length}`;
+
+      const debugMsg = `Cloudinary Error: ${resData.error?.message || "Cloudinary upload failed"}. ` +
+                       `Debug config: cloud=${cloudName}, key=${obscuredKey}, secret=${obscuredSecret}, ` +
+                       `stringToSign length=${stringToSign.length}`;
+
+      return new Response(JSON.stringify({ error: debugMsg }), {
         status: response.status,
         headers: { "Content-Type": "application/json" }
       });
