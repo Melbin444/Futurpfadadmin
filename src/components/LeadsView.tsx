@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { Search, X, Check, Archive, Trash2, Mail, Phone } from "lucide-react";
+import { Search, X, Check, Archive, Trash2, Mail, Phone, Layers, Inbox, UserCheck } from "lucide-react";
 import { Lead } from "../engines/types";
 
 interface LeadsViewProps {
@@ -25,25 +25,45 @@ export function LeadsView({
   updateLeadStatus,
   deleteLead,
 }: LeadsViewProps) {
+  const countAll = leads.length;
+  const countNew = leads.filter((l) => l.status === "new").length;
+  const countContacted = leads.filter((l) => l.status === "contacted").length;
+  const countArchived = leads.filter((l) => l.status === "archived").length;
+
   return (
     <div className="space-y-6 animate-fadeIn">
       
       {/* Filtering Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#faf9f6]/95 border border-champagne/60 p-4 rounded-[2rem] shadow-soft">
-        <div className="flex border border-champagne/50 bg-white/70 rounded-2xl p-1 shrink-0">
-          {(["all", "new", "contacted", "archived"] as const).map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setLeadsFilter(filter)}
-              className={`px-4.5 py-2.5 text-[9px] font-bold uppercase tracking-[0.15em] rounded-xl transition-all cursor-pointer ${
-                leadsFilter === filter
-                  ? "bg-[#0c1c30] text-white shadow-sm"
-                  : "text-slate-500 hover:text-navy"
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
+      <div className="flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4 bg-[#faf9f6]/95 border border-champagne/60 p-4 rounded-[2rem] shadow-soft">
+        <div className="flex flex-wrap gap-2 p-1.5 bg-white border border-champagne/45 rounded-2xl shrink-0">
+          {[
+            { key: "all", label: "All", count: countAll, icon: Layers, activeClass: "bg-[#0c1c30] text-white shadow-md shadow-[#0c1c30]/10", badgeClass: "bg-white/20 text-white", inactiveBadgeClass: "bg-slate-100 text-slate-500" },
+            { key: "new", label: "New", count: countNew, icon: Inbox, activeClass: "bg-amber-600 text-white shadow-md shadow-amber-600/10", badgeClass: "bg-white/25 text-white", inactiveBadgeClass: "bg-amber-50 text-amber-600 border border-amber-200/30" },
+            { key: "contacted", label: "Contacted", count: countContacted, icon: UserCheck, activeClass: "bg-emerald-600 text-white shadow-md shadow-emerald-600/10", badgeClass: "bg-white/25 text-white", inactiveBadgeClass: "bg-emerald-50 text-emerald-600 border border-emerald-250/30" },
+            { key: "archived", label: "Archived", count: countArchived, icon: Archive, activeClass: "bg-slate-600 text-white shadow-md shadow-slate-600/10", badgeClass: "bg-white/25 text-white", inactiveBadgeClass: "bg-slate-100 text-slate-400" },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isActive = leadsFilter === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setLeadsFilter(item.key as any)}
+                className={`flex items-center gap-2 px-4 py-2.5 text-[10.5px] font-bold uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                  isActive
+                    ? `${item.activeClass} font-extrabold`
+                    : "text-slate-500 hover:text-navy hover:bg-[#faf9f6]"
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${isActive ? "opacity-100" : "opacity-60"}`} />
+                <span>{item.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${
+                  isActive ? item.badgeClass : item.inactiveBadgeClass
+                }`}>
+                  {item.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="relative flex-1 max-w-md">
