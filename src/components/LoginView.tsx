@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Lock, Eye, EyeOff, ShieldAlert, Wifi, Key } from "lucide-react";
+import { Lock, Eye, EyeOff, ShieldAlert, Key } from "lucide-react";
 
 interface LoginViewProps {
   password?: string;
@@ -132,23 +132,6 @@ export function LoginView({
           </p>
         </div>
 
-        {/* Live Network & Encryption Metrics */}
-        <div className="mt-8 pt-6 border-t border-champagne/45 grid grid-cols-3 gap-2 text-[9.5px] font-bold uppercase tracking-wider text-slate-400">
-          <div className="flex flex-col items-center gap-1 border-r border-champagne/30">
-            <span className="text-slate-350">Protocol</span>
-            <span className="text-teal font-mono">TLS 1.3</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 border-r border-champagne/30">
-            <span className="text-slate-350">Database</span>
-            <span className="text-teal font-mono">D1 Edge</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-slate-350">Network</span>
-            <span className="text-emerald-600 flex items-center gap-1">
-              <Wifi className="h-3 w-3 animate-pulse" /> Active
-            </span>
-          </div>
-        </div>
 
       </div>
     </div>
