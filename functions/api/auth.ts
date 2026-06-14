@@ -61,12 +61,13 @@ export const onRequest: PagesFunction<Env> = async (context) => {
             { status: 500, headers: { "Content-Type": "application/json" } }
           );
         }
-        if (password === adminPassword) {
-          const sessionHash = await sha256(adminPassword);
+        const expectedHash = await sha256(adminPassword);
+        const inputHash = await sha256(password ?? "");
+        if (inputHash === expectedHash) {
           return new Response(JSON.stringify({ success: true }), {
             headers: {
               "Content-Type": "application/json",
-              "Set-Cookie": `admin_session=${sessionHash}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`, // 1 week
+              "Set-Cookie": `admin_session=${expectedHash}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`, // 1 week
             },
           });
         } else {
